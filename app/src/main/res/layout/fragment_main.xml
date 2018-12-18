@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|top"
+    android:orientation="vertical"
+    tools:context=".SelectSimFragment">
+
+    <TextView
+        android:paddingTop="10dp"
+        android:id="@+id/tv_network_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Network Status:" />
+    <TextView
+        android:paddingTop="10dp"
+        android:id="@+id/tv_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Counter: 0" />
+ <TextView
+        android:paddingTop="10dp"
+        android:id="@+id/tv_socket_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Socket disconnected" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/sim_1_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:padding="30dp"
+            android:text="Sim 1:      " />
+
+        <Switch
+            android:id="@+id/sim_1_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:padding="5dp"
+            android:textColor="#fff"
+            android:textOff=""
+            android:textOn=""
+            android:thumb="@drawable/nfdwstd_switch_thumb"
+            android:track="@drawable/nfdwstd_switch" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sim_2_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/sim_2_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:padding="30dp"
+            android:text="Sim 1:      " />
+        <Switch
+            android:id="@+id/sim_2_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:padding="5dp"
+            android:textColor="#fff"
+            android:textOff=""
+            android:textOn=""
+            android:thumb="@drawable/nfdwstd_switch_thumb"
+            android:track="@drawable/nfdwstd_switch" />
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
