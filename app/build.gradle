@@ -32,6 +32,11 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
+    implementation 'com.github.clans:fab:1.6.4'
+
     implementation 'com.github.nkzawa:socket.io-client:0.3.0'
+    implementation 'com.github.zcweng:switch-button:0.0.3@aar'
+
+    implementation 'com.github.heetch:Android-country-picker:1.0.6'
 
 }

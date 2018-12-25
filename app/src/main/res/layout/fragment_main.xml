@@ -4,87 +4,165 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center|top"
+    android:gravity="top"
     android:orientation="vertical"
     tools:context=".SelectSimFragment">
 
-    <TextView
-        android:paddingTop="10dp"
-        android:id="@+id/tv_network_status"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Network Status:" />
-    <TextView
-        android:paddingTop="10dp"
-        android:id="@+id/tv_counter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Counter: 0" />
- <TextView
-        android:paddingTop="10dp"
-        android:id="@+id/tv_socket_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Socket disconnected" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center">
+        android:padding="5dp">
 
         <TextView
-            android:id="@+id/sim_1_tv"
+            android:id="@+id/tv_socket_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:textColor="@color/black"
-            android:textSize="20dp"
-            android:padding="30dp"
-            android:text="Sim 1:      " />
-
-        <Switch
-            android:id="@+id/sim_1_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:padding="5dp"
-            android:textColor="#fff"
-            android:textOff=""
-            android:textOn=""
-            android:thumb="@drawable/nfdwstd_switch_thumb"
-            android:track="@drawable/nfdwstd_switch" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/sim_2_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center">
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="10dp"
+            android:paddingTop="10dp"
+            android:text="Socket: OFF" />
 
         <TextView
-            android:id="@+id/sim_2_tv"
+            android:id="@+id/tv_counter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:textColor="@color/black"
-            android:textSize="20dp"
-            android:padding="30dp"
-            android:text="Sim 1:      " />
-        <Switch
-            android:id="@+id/sim_2_switch"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="10dp"
+            android:paddingTop="10dp"
+            android:text="Counter: 0 " />
+
+        <TextView
+            android:id="@+id/tv_network_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:padding="5dp"
-            android:textColor="#fff"
-            android:textOff=""
-            android:textOn=""
-            android:thumb="@drawable/nfdwstd_switch_thumb"
-            android:track="@drawable/nfdwstd_switch" />
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
+            android:paddingTop="10dp"
+            android:text="Network: " />
 
-    </LinearLayout>
 
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/sim_1_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sim 1:      "
+                        android:textColor="@color/black" />
+
+                    <com.suke.widget.SwitchButton
+                        android:id="@+id/sim_1_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:textColor="#fff"
+                        android:textOff=""
+                        android:textOn=""
+                        android:thumb="@drawable/nfdwstd_switch_thumb"
+                        android:track="@drawable/nfdwstd_switch" />
+
+
+                </LinearLayout>
+
+                <ListView
+                    android:id="@+id/country_list_sim1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"></ListView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sim_2_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/sim_2_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:text="Sim 2:      "
+                        android:textColor="@color/black" />
+
+                    <com.suke.widget.SwitchButton
+                        android:id="@+id/sim_2_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:textColor="#fff"
+                        android:textOff=""
+                        android:textOn=""
+                        android:thumb="@drawable/nfdwstd_switch_thumb"
+                        android:track="@drawable/nfdwstd_switch" />
+
+                </LinearLayout>
+
+                <ListView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"></ListView>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/fabMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp">
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/add_country_sim1"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:fab_label="Add country in SIM 1"
+                app:fab_size="mini" />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/add_country_sim2"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="#ba9dda"
+                app:fab_label="Add country in SIM 2"
+                app:fab_size="mini" />
+
+        </com.github.clans.fab.FloatingActionMenu>
+    </RelativeLayout>
 
 
 </LinearLayout>

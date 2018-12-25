@@ -113,8 +113,8 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     private void setupViewPager() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+     /*   Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
 
 
         adapter = new SectionsPagerAdapter(getSupportFragmentManager());
