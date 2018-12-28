@@ -63,76 +63,70 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:gravity="center">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-                    <TextView
-                        android:id="@+id/sim_1_tv"
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sim 1:      "
-                        android:textColor="@color/black" />
-
-                    <com.suke.widget.SwitchButton
-                        android:id="@+id/sim_1_switch"
+                        android:layout_gravity="center"
+                        android:gravity="center">
+                        <TextView
+                            android:id="@+id/sim_1_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sim 1:      "
+                            android:textColor="@color/black" />
+                        <com.suke.widget.SwitchButton
+                            android:id="@+id/sim_1_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:textColor="#fff"
+                            android:textOff=""
+                            android:textOn=""
+                            android:thumb="@drawable/nfdwstd_switch_thumb"
+                            android:track="@drawable/nfdwstd_switch" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/sim_2_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:textColor="#fff"
-                        android:textOff=""
-                        android:textOn=""
-                        android:thumb="@drawable/nfdwstd_switch_thumb"
-                        android:track="@drawable/nfdwstd_switch" />
+                        android:layout_gravity="center"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/sim_2_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:text="Sim 2:      "
+                            android:textColor="@color/black" />
+
+                        <com.suke.widget.SwitchButton
+                            android:id="@+id/sim_2_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:textColor="#fff"
+                            android:textOff=""
+                            android:textOn=""
+                            android:thumb="@drawable/nfdwstd_switch_thumb"
+                            android:track="@drawable/nfdwstd_switch" />
+
+                    </LinearLayout>
 
 
                 </LinearLayout>
-
                 <ListView
                     android:id="@+id/country_list_sim1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"></ListView>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/sim_2_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/sim_2_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:text="Sim 2:      "
-                        android:textColor="@color/black" />
-
-                    <com.suke.widget.SwitchButton
-                        android:id="@+id/sim_2_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:textColor="#fff"
-                        android:textOff=""
-                        android:textOn=""
-                        android:thumb="@drawable/nfdwstd_switch_thumb"
-                        android:track="@drawable/nfdwstd_switch" />
-
-                </LinearLayout>
-
-                <ListView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"></ListView>
-            </LinearLayout>
 
 
         </LinearLayout>

@@ -3,10 +3,12 @@ package com.example.pamir.myapplication;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class StatsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -44,9 +46,26 @@ public class StatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_stats, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_stats, container, false);
+
+        com.suke.widget.SwitchButton sim1Switch = rootView.findViewById(R.id.sim_1_switch);
+        sim1Switch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+
+                final LoadingDialog dialog = LoadingDialog.show(getContext(), "Logging in...");
+
+            }
+        });
+        return  rootView;
     }
 
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+
+    }
 
     @Override
     public void onAttach(Context context) {

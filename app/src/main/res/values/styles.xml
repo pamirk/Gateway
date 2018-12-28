@@ -17,4 +17,59 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="WrapContent" parent="@style/Layout">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Block" parent="@style/WrapContent">
+        <item name="android:layout_width">fill_parent</item>
+    </style>
+
+    <style name="TextView" parent="@style/Block">
+        <item name="android:textSize">@dimen/text</item>
+        <item name="android:textColor">@color/light_alpha</item>
+        <item name="android:lineSpacingMultiplier">1.0</item>
+        <item name="line_spacing_multiplier">1.4</item>
+    </style>
+    <style name="LoadingText" parent="@style/TextView">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/loading_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:id">@id/loading_text</item>
+        <item name="android:text">Loading...</item>
+    </style>
+
+
+    <style name="Spinner">
+        <item name="android:id">@id/spinner</item>
+        <item name="android:layout_width">@dimen/spinner_size</item>
+        <item name="android:layout_height">@dimen/spinner_size</item>
+        <item name="android:layout_marginBottom">@dimen/text_margin</item>
+        <item name="android:src">@drawable/spinner</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+    <style name="LoadingDialog" parent="@style/MatchParent">
+        <item name="android:gravity">center</item>
+        <item name="android:background">#99000000</item>
+        <item name="android:paddingLeft">@dimen/content_padding</item>
+        <item name="android:paddingTop">@dimen/content_padding</item>
+        <item name="android:paddingRight">@dimen/content_padding</item>
+        <item name="android:paddingBottom">@dimen/content_padding</item>
+    </style>
+
+    <style name="MatchParent" parent="@style/Layout">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+    <style name="Layout">
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_width">0.0dip</item>
+        <item name="android:layout_height">0.0dip</item>
+    </style>
+
+    <dimen name="content_padding">20dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="text">15sp</dimen>
+    <item name="loading_text" type="id" />
 </resources>

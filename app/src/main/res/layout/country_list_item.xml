@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="64dp"
+    android:paddingRight="32dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    tools:background="#fff">
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:id="@+id/circleImageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/correct_check_mark"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/countryNameLabel"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/circleImageView"
+        android:layout_toEndOf="@+id/circleImageView"
+        android:textColor="#ffaa00"
+        android:textSize="20sp"
+        tools:text="Pakistan"
+        android:paddingLeft="10dp"/>
+
+
+</RelativeLayout>

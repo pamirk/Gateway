@@ -318,4 +318,8 @@
     <color name="grey_800">#424242</color>
     <color name="grey_900">#212121</color>
     <color name="green_careem">#37b44e</color>
+    <color name="loading_text">#99ffffff</color>
+
+    <color name="light_alpha">#80000000</color>
+
 </resources>

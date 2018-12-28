@@ -8,38 +8,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.TextView;
+import android.telephony.TelephonyManager;
 import android.widget.Toast;
-
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
 public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
     private static final String TAG = "mainActivity";
@@ -52,30 +36,9 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     private final String DELIVERED = "SMS_DELIVERED";
     PendingIntent sentPI, deliveredPI;
     BroadcastReceiver smsSentReceiver, smsDeliveredReceiver, networkStatusReceiver;
-
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
-
-    private String _id;
-    private String number;
-    private String code;
-    private String country;
-
-    int smsCounter = 0;
-    private Socket mSocket;
     ArrayList<String> subInfoStrings;
-    SectionsPagerAdapter adapter;
-    //static init o socket
-    {
-        try {
-            mSocket = IO.socket("https://gs-validations.herokuapp.com/");
-        } catch (URISyntaxException e) {
-            Log.i(TAG, e.toString());
-        }
-    }
+    public static SectionsPagerAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,29 +60,33 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
         subInfoStrings = new ArrayList<>();
 
+
+
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, MY_PERMISSIONS_REQUEST_SEND_SMS);
         }
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            mSubscriptionManager = SubscriptionManager.from(this);
-            subInfoList = mSubscriptionManager.getActiveSubscriptionInfoList();
-            for (int i = 0; i < subInfoList.size(); i++) {
-                SubscriptionInfo lsuSubscriptionInfo = subInfoList.get(i);
-                sims.add(lsuSubscriptionInfo.getSubscriptionId());
-                subInfoStrings.add(subInfoList.get(i).getCarrierName().toString());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                mSubscriptionManager = SubscriptionManager.from(this);
+                subInfoList = mSubscriptionManager.getActiveSubscriptionInfoList();
+                for (int i = 0; i < subInfoList.size(); i++) {
+                    SubscriptionInfo lsuSubscriptionInfo = subInfoList.get(i);
+                    sims.add(lsuSubscriptionInfo.getSubscriptionId());
+                    subInfoStrings.add(subInfoList.get(i).getCarrierName().toString());
+                }
+            } else {
+                TelephonyManager manager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                String carrierName = manager.getNetworkOperatorName();
+                subInfoStrings.add(carrierName);
             }
-
         }
     }
 
     private void setupViewPager() {
-     /*   Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
-
-
         adapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
         adapter.addFragment(SelectSimFragment.newInstance(subInfoStrings));
-        adapter.addFragment(StatsFragment.newInstance("",""));
+        adapter.addFragment(StatsFragment.newInstance("", ""));
 
         ViewPager mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(adapter);
@@ -134,59 +101,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         tabLayout.getTabAt(1).setText("Stats");
     }
 
-    @Override
-    public void newValidationSocket(int simIndex) {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, MY_PERMISSIONS_REQUEST_SEND_SMS);
-        }
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            SmsManager sm = SmsManager.getSmsManagerForSubscriptionId(SubscriptionManager.from(this).getActiveSubscriptionInfoList().get(simIndex).getSubscriptionId());
 
-            mSocket.connect();
-            mSocket.on(EVENT_NEW_VALIDATION, args -> {
-                runOnUiThread(() -> {
-                    JSONObject data = (JSONObject) args[0];
-                    Log.i(TAG, data.toString());
-
-                    try {
-                        _id = data.getString("_id");
-                        number = data.getString("number");
-                        code = data.getString("code");
-                        country = data.getString("country");
-
-                        String encrypted = code;
-                        String password = "$-&Aahj!.n12=.@";
-                        String decryptedCode = Crypto.decrypt(password, encrypted);
-
-                        String message = VERIFICATION_MESSAGE + decryptedCode;
-                        sendMessage(sm, number, message);
-
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            });
-        }
-
-    }
-
-    @Override
-    public void stopSocketConnection() {
-        mSocket.disconnect();
-        mSocket.off(EVENT_NEW_VALIDATION);
-        Toast.makeText(getApplicationContext(),"Socket Disconnected Successfully" , Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public boolean isSocketConnected() {
-        return mSocket.connected();
-    }
-
-    @Override
-    public void connectSocket() {
-        mSocket.connect();
-    }
     public void sendMessage(SmsManager sms, String phone, String message) {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
@@ -195,19 +110,8 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
             sms.sendTextMessage(phone, null, message, sentPI, deliveredPI);
         }
     }
-    private void statusChangeSocket(String status) {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("_id", _id);
-            json.put("status", status);
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        mSocket.emit(EVENT_STATUS_CHANGE, json);
-
-    }
-    private void broadcastReciverHelper() {
+    private void initBroadcastReciver() {
 
         smsSentReceiver = new BroadcastReceiver() {
             @Override
@@ -216,16 +120,11 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(context, "SMS sent successfully!", Toast.LENGTH_SHORT).show();
-                        smsCounter++;
-                        SelectSimFragment selectSimFragment = (SelectSimFragment) adapter.getItem(0);
-                        selectSimFragment.setSMSCounterTv(smsCounter);
-                        statusChangeSocket("sent");
                         break;
 
                     //Something went wrong and there's no way to tell what, why or how.
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
                         Toast.makeText(context, "Generic failure!", Toast.LENGTH_SHORT).show();
-                        statusChangeSocket("failed");
                         break;
 
                     //Your device simply has no cell reception. You're probably in the middle of
@@ -261,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(context, "SMS delivered!", Toast.LENGTH_SHORT).show();
-                        statusChangeSocket("delivered");
                         break;
 
                     case Activity.RESULT_CANCELED:
@@ -298,13 +196,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     @Override
     protected void onResume() {
         super.onResume();
-        broadcastReciverHelper();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
+        initBroadcastReciver();
     }
 
     @Override
@@ -314,36 +206,5 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         unregisterReceiver(smsDeliveredReceiver);
         unregisterReceiver(networkStatusReceiver);
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mSocket.disconnect();
-        mSocket.off(EVENT_NEW_VALIDATION);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
 
 }

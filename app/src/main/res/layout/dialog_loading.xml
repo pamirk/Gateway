@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout style="@style/LoadingDialog">
+    <com.example.pamir.myapplication.LoadingSpinner  style="@style/Spinner" />
+    <TextView style="@style/LoadingText" />
+</LinearLayout>
