@@ -49,7 +49,7 @@ public class MyService extends Service {
     private final String DELIVERED = "SMS_DELIVERED";
     PendingIntent sentPI, deliveredPI;
     BroadcastReceiver smsSentReceiver, smsDeliveredReceiver;
-
+ 
     private String _id;
     private String number;
     private String code;
