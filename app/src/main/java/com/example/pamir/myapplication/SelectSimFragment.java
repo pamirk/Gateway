@@ -1,5 +1,6 @@
 package com.example.pamir.myapplication;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -29,14 +31,20 @@ import com.heetch.countrypicker.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
+import static com.example.pamir.myapplication.MyService.MY_PREFS_NAME;
+import static com.example.pamir.myapplication.MyService.SMS_COUNTER;
 
 public class SelectSimFragment extends Fragment {
     private static final String TAG = "SelectSimFragment";
     public static final String MY_PREFS_NAME = "MyPrefsFile";
+
     private ArrayList<com.example.pamir.myapplication.Country> mCountries;
     Intent serviceIntent;
 
@@ -44,7 +52,8 @@ public class SelectSimFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     View rootView;
 
-    public SelectSimFragment() {}
+    public SelectSimFragment() {
+    }
 
     public static SelectSimFragment newInstance(ArrayList<String> subInfoStrings) {
         SelectSimFragment fragment = new SelectSimFragment();
@@ -94,11 +103,20 @@ public class SelectSimFragment extends Fragment {
         com.suke.widget.SwitchButton sim2Switch = rootView.findViewById(R.id.sim_2_switch);
         FloatingActionMenu mFloatingActionMenu = rootView.findViewById(R.id.fabMenu);
         com.github.clans.fab.FloatingActionButton add_country_sim1 = rootView.findViewById(R.id.add_country_sim1);
+        com.github.clans.fab.FloatingActionButton reset = rootView.findViewById(R.id.reset);
+
+        reset.setOnClickListener(v -> {
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+            setSMSCounterTv(0);
+            MyService.smsCounter = 0;
+            editor.putInt(SMS_COUNTER, 0);
+            editor.apply();
+        });
         ListView listView = rootView.findViewById(R.id.country_list_sim1);
 
-        mCountries  = new ArrayList<>();
+        mCountries = new ArrayList<>();
         int flagResID = Utils.getMipmapResId(getContext(), "PK".toLowerCase(Locale.ENGLISH) + "_flag");
-        mCountries.add(new Country("PK","+92", String.valueOf(flagResID),"Pakistan"));
+        mCountries.add(new Country("PK", "+92", String.valueOf(flagResID), "Pakistan"));
         CountryAdapter countryAdapter = new CountryAdapter(getActivity(), mCountries);
 
 
@@ -106,7 +124,6 @@ public class SelectSimFragment extends Fragment {
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             /*countryAdapter.remove(countryAdapter.getItem(position));
             countryAdapter.notifyDataSetChanged();*/
-
 
 
             return true;
@@ -157,9 +174,12 @@ public class SelectSimFragment extends Fragment {
                 startMyService(0);
                 textView_socket_status.setText("Socket: ON");
             } else {
+
                 stopMyService();
                 sim2Switch.setEnabled(true);
                 textView_socket_status.setText("Socket: OFF");
+
+                waitPlease();
 
             }
         });
@@ -175,12 +195,60 @@ public class SelectSimFragment extends Fragment {
                 stopMyService();
                 textView_socket_status.setText("Socket: OFF");
 
+                waitPlease();
             }
         });
 
     }
+
+
+    private void waitPlease(){
+        final LoadingDialog dialog = LoadingDialog.show(getActivity(), "Wait janii...");
+        dialog.setCancelable(false);
+
+
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                dialog.dismiss();
+            }
+        };
+        Handler handler = new Handler();
+        handler.postDelayed(runnable, 2 * 1000);
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (isMyServiceRunning()){
+
+
+            int simNo = MyService.SERVICE_STARTED_BY_SIM;
+            if (simNo == 0) {
+                com.suke.widget.SwitchButton sim1Switch = rootView.findViewById(R.id.sim_1_switch);
+                sim1Switch.setChecked(true);
+            } else if (simNo == 1){
+                com.suke.widget.SwitchButton sim2Switch = rootView.findViewById(R.id.sim_2_switch);
+                sim2Switch.setChecked(true);
+            }
+
+            TextView textView_socket_status = rootView.findViewById(R.id.tv_socket_status);
+            textView_socket_status.setText("Socket: ON");
+        }
+
+
+        SharedPreferences prefs = getActivity().getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        int smsCounter = prefs.getInt(SMS_COUNTER, 0);
+        setSMSCounterTv(smsCounter);
+    }
+
+    @SuppressLint("BatteryLife")
     private void startMyService(int i) {
-        if (!isMyServiceRunning()) {
+        if (!isMyServiceRunning() && getContext() != null){
             serviceIntent = new Intent(getContext(), MyService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 serviceIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
@@ -196,14 +264,15 @@ public class SelectSimFragment extends Fragment {
     }
 
     private void stopMyService() {
-        if (isMyServiceRunning()) {
-            if (serviceIntent == null) {
+        if (isMyServiceRunning() && getContext() != null) {
+            if (serviceIntent == null ) {
                 Intent serviceIntentnew = new Intent(getContext(), MyService.class);
                 getContext().stopService(serviceIntentnew);
 
             } else {
                 getContext().stopService(serviceIntent);
             }
+
         }
 
     }

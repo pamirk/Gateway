@@ -40,5 +40,7 @@ dependencies {
     implementation 'com.github.heetch:Android-country-picker:1.0.6'
     implementation 'com.jakewharton:butterknife:9.0.0-rc3'
     annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-rc3'
+    implementation 'com.google.dagger:dagger:2.4'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.4'
 
 }

@@ -302,4 +302,8 @@
     <attr name="vpiTitlePageIndicatorStyle" format="reference" />
     <attr name="vpiTabPageIndicatorStyle" format="reference" />
     <attr name="vpiUnderlinePageIndicatorStyle" format="reference" />
+    <declare-styleable name="Treehouse">
+
+
+    </declare-styleable>
 </resources>

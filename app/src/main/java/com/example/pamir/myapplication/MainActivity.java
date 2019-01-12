@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -24,13 +25,12 @@ import android.telephony.TelephonyManager;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.pamir.myapplication.MyService.MY_PREFS_NAME;
+import static com.example.pamir.myapplication.MyService.SMS_COUNTER;
+
 public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
-
     private static final String TAG = "mainActivity";
-    private static final String VERIFICATION_MESSAGE = "Your Geosocio One Time Pass Code is: ";
-    private static final String EVENT_NEW_VALIDATION = "new-validation";
-    private static final String EVENT_STATUS_CHANGE = "status-change";
-
     private final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
     private final String SENT = "SMS_SENT";
     private final String DELIVERED = "SMS_DELIVERED";
@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         sentPI = PendingIntent.getBroadcast(MainActivity.this, 0, new Intent(SENT), 0);
         deliveredPI = PendingIntent.getBroadcast(MainActivity.this, 0, new Intent(DELIVERED), 0);
 
@@ -86,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         adapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         adapter.addFragment(SelectSimFragment.newInstance(subInfoStrings));
-        adapter.addFragment(StatsFragment.newInstance("", ""));
+        adapter.addFragment(StatsFragment.newInstance(""));
 
         ViewPager mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(adapter);

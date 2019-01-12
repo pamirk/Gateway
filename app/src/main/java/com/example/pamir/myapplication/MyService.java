@@ -18,7 +18,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
@@ -32,6 +31,7 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 
 
+import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -39,12 +39,12 @@ import static com.example.pamir.myapplication.App.CHANNEL_ID;
 
 public class MyService extends Service {
     private static final String TAG = "MyService";
-    private Socket mSocket;
-    private static final String VERIFICATION_MESSAGE = "Your Geosocio One Time Pass Code is: ";
+    public static final String SMS_COUNTER = "smsCounter";
+    private static final String VERIFICATION_MESSAGE = "Geosocio Passcode is:  ";
     private static final String EVENT_NEW_VALIDATION = "new-validation";
     private static final String EVENT_STATUS_CHANGE = "status-change";
     public static final String MY_PREFS_NAME = "MyPrefsFile";
-    private final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
+    public static int SERVICE_STARTED_BY_SIM = 0;
     private final String SENT = "SMS_SENT";
     private final String DELIVERED = "SMS_DELIVERED";
     PendingIntent sentPI, deliveredPI;
@@ -54,11 +54,15 @@ public class MyService extends Service {
     private String number;
     private String code;
     private String country;
-    private int smsCounter = 0;
-
-    // Unique Identification Number for the Notification.
-    // We use it on Notification start, and to cancel it.
-    private int NOTIFICATION = 2;
+    public static int smsCounter;
+    SmsManager sm;
+    public static Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("https://gs-validations.herokuapp.com/");
+        } catch (URISyntaxException e) {
+        }
+    }
 
     public MyService() {
     }
@@ -67,8 +71,9 @@ public class MyService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        getSharedPrefs();
+        restoreSharedPrefs();
         //setupNotification();
+
 
         sentPI = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(SENT), 0);
         deliveredPI = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(DELIVERED), 0);
@@ -77,15 +82,15 @@ public class MyService extends Service {
         Log.d(TAG, "onCreate: called.");
     }
 
-    private void setSharedPrefs() {
+    private void saveSharedPrefs() {
         SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
-        editor.putInt("smsCounter", smsCounter);
+        editor.putInt(SMS_COUNTER, smsCounter);
         editor.apply();
     }
 
-    private void getSharedPrefs() {
+    private void restoreSharedPrefs() {
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        smsCounter = prefs.getInt("smsCounter", 0);
+        smsCounter = prefs.getInt(SMS_COUNTER, 0);
     }
 
     private void setupNotification() {
@@ -105,118 +110,80 @@ public class MyService extends Service {
             startForeground(1, notification);
         } else {
 
-           /* Intent intent = new Intent(this, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,0);
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this,"2")
-                    .setContentTitle("")
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setContentText("")
-                    .setTicker("TICKER")
+            Intent notificationIntent = new Intent(this, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setSmallIcon(R.drawable.correct_check_mark)
-                    .setContentIntent(pendingIntent);
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.correct_check_mark))
+                    .setContentTitle("Geosocio is running")
+                    .setContentText("Service is running")
+                    .setOngoing(true)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setTicker("TICKER")
+                    .setProgress(100, 0, false)
+                    .setContentIntent(pendingIntent).build();
 
-            Notification notification=builder.build();
-
-            startForeground(1, notification);*/
-            initializeBackgroundNotification();
+            stopForeground(true);
+            startForeground(1, notification);
         }
 
 
     }
 
-    private NotificationCompat.Builder initializeBackgroundNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getBaseContext(), "123");
-
-        builder.setSmallIcon(R.drawable.correct_check_mark);
-        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.correct_check_mark));
-        builder.setContentTitle("Geosocio is running");
-        builder.setContentText("Service is running");
-        builder.setOngoing(true);
-        builder.setProgress(100, 0, false);
-        builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0));
-        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        stopForeground(true);
-        startForeground(4242, builder.build());
-
-        return builder;
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: called.");
-        //setupNotification();
 
-        try {
-            IO.Options opts = new IO.Options();
-            opts.reconnection = true;
-            mSocket = IO.socket("https://gs-validations.herokuapp.com/");
-        } catch (URISyntaxException e) {
-        }
 
-        mSocket.connect();
         int i = 1;
         if (intent != null) {
             i = intent.getIntExtra("index", -1);
+            SERVICE_STARTED_BY_SIM = i;
         }
         newValidationSocket(i);
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.correct_check_mark)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.correct_check_mark))
-                .setContentTitle("Geosocio is running")
-                .setContentText("Service is running")
-                .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setTicker("TICKER")
-                .setProgress(100, 0, false)
-                .setContentIntent(pendingIntent).build();
-
-        stopForeground(true);
-        startForeground(1, notification);
-        return START_REDELIVER_INTENT;
+        setupNotification();
+        return START_STICKY;
     }
 
 
     public void newValidationSocket(int simIndex) {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            SmsManager sm;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
                 sm = SmsManager.getSmsManagerForSubscriptionId(SubscriptionManager.from(getApplicationContext()).getActiveSubscriptionInfoList().get(simIndex).getSubscriptionId());
             } else {
                 sm = SmsManager.getDefault();
             }
-
-            mSocket.on(EVENT_NEW_VALIDATION, args ->
-                    new Handler(Looper.getMainLooper()).post(() -> {
+            mSocket.on(EVENT_NEW_VALIDATION, onLogin);
 
 
-                        JSONObject data = (JSONObject) args[0];
-                        Log.i(TAG, data.toString());
-                        try {
-
-                            Toast.makeText(this, data.toString(), Toast.LENGTH_LONG).show();
-                            _id = data.getString("_id");
-                            number = data.getString("number");
-                            code = data.getString("code");
-                            country = data.getString("country");
-
-                            String encrypted = code;
-                            String password = "$-&Aahj!.n12=.@";
-                            String decryptedCode = Crypto.decrypt(password, encrypted);
-
-                            String message = VERIFICATION_MESSAGE + decryptedCode;
-                            sendMessage(sm, number, message);
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }));
+            mSocket.connect();
         }
     }
 
+    private Emitter.Listener onLogin = args -> new Handler(Looper.getMainLooper()).post(() -> {
+                JSONObject data = (JSONObject) args[0];
+                Log.i(TAG, data.toString());
+                try {
+                    //Toast.makeText(this, data.toString(), Toast.LENGTH_LONG).show();
+                    _id = data.getString("_id");
+                    number = data.getString("number");
+                    code = data.getString("code");
+                    country = data.getString("country");
+
+                    String encrypted = code;
+                    String password = "$-&Aahj!.n12=.@";
+                    String decryptedCode = Crypto.decrypt(password, encrypted);
+
+                    String message = VERIFICATION_MESSAGE + decryptedCode;
+                    sendMessage(sm, number, message);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
 
     public void sendMessage(SmsManager sms, String phone, String message) {
         Log.d(TAG, "sendMessage: called.");
@@ -227,10 +194,7 @@ public class MyService extends Service {
     private void broadcastReciverHelper() {
 
         smsSentReceiver = new SmsSentReceiver();
-
         smsDeliveredReceiver = new SmsDeliveredReceiver();
-
-
         registerReceiver(smsSentReceiver, new IntentFilter(SENT));
         registerReceiver(smsDeliveredReceiver, new IntentFilter(DELIVERED));
     }
@@ -238,8 +202,9 @@ public class MyService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        setSharedPrefs();
+        saveSharedPrefs();
         mSocket.disconnect();
+        mSocket.off("new message", onLogin);
 
         unregisterReceiver(smsSentReceiver);
         unregisterReceiver(smsDeliveredReceiver);
@@ -274,10 +239,13 @@ public class MyService extends Service {
                     Toast.makeText(context, "SMS sent successfully!", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "SMS sent successfully: called.");
                     smsCounter++;
+                    saveSharedPrefs();
 
-/*
-                    SelectSimFragment selectSimFragment = (SelectSimFragment) MainActivity.adapter.getItem(0);
-                    selectSimFragment.setSMSCounterTv(smsCounter);*/
+                    if (MainActivity.adapter != null) {
+                        SelectSimFragment selectSimFragment = (SelectSimFragment) MainActivity.adapter.getItem(0);
+                        if (selectSimFragment != null)
+                            selectSimFragment.setSMSCounterTv(smsCounter);
+                    }
                     emitStatus("sent");
                     break;
 

@@ -1,33 +1,26 @@
 package com.example.pamir.myapplication;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 public class StatsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
+    private static final String SMS_COUNTER = "smsCounter";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
 
     private OnFragmentInteractionListener mListener;
 
     public StatsFragment() {}
 
-    public static StatsFragment newInstance(String param1, String param2) {
+    public static StatsFragment newInstance(String param2) {
         StatsFragment fragment = new StatsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -36,10 +29,6 @@ public class StatsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -48,14 +37,6 @@ public class StatsFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_stats, container, false);
 
-        com.suke.widget.SwitchButton sim1Switch = rootView.findViewById(R.id.sim_1_switch);
-        sim1Switch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-
-                final LoadingDialog dialog = LoadingDialog.show(getContext(), "Logging in...");
-
-            }
-        });
         return  rootView;
     }
 

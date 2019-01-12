@@ -141,6 +141,12 @@
             android:layout_margin="16dp">
 
             <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/reset"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:fab_label="reset SMS counter"
+                app:fab_size="mini" />
+            <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/add_country_sim1"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
