@@ -7,12 +7,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -26,10 +24,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.pamir.myapplication.MyService.MY_PREFS_NAME;
-import static com.example.pamir.myapplication.MyService.SMS_COUNTER;
-
-public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "mainActivity";
     private final int MY_PERMISSIONS_REQUEST_SEND_SMS = 1;
     private final String SENT = "SMS_SENT";

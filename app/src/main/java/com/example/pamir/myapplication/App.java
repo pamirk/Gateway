@@ -8,17 +8,10 @@ import android.os.Build;
 
 public class App extends Application {
     public static final String CHANNEL_ID = "GeosocioServiceChannel";
-    private AppComponent component;
-
-    public static AppComponent component(Context context) {
-        return app(context).component();
-    }
     public static App app(Context context) {
         return (App) context.getApplicationContext();
     }
-    public AppComponent component() {
-        return this.component;
-    }
+
 
     @Override
     public void onCreate() {

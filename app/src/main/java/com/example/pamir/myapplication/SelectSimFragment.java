@@ -49,7 +49,6 @@ public class SelectSimFragment extends Fragment {
     Intent serviceIntent;
 
     private static final String ARG_SUBSCRIPTION_INFO = "sims_number";
-    private OnFragmentInteractionListener mListener;
     View rootView;
 
     public SelectSimFragment() {
@@ -167,7 +166,7 @@ public class SelectSimFragment extends Fragment {
             }
         }
         sim1Switch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked && mListener != null) {
+            if (isChecked ) {
                 sim2Switch.setChecked(false);
                 sim2Switch.setEnabled(false);
 
@@ -184,7 +183,7 @@ public class SelectSimFragment extends Fragment {
             }
         });
         sim2Switch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked && mListener != null) {
+            if (isChecked) {
                 sim1Switch.setChecked(false);
                 sim1Switch.setEnabled(false);
                 textView_socket_status.setText("Socket: ON");
@@ -295,22 +294,5 @@ public class SelectSimFragment extends Fragment {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 }
 
